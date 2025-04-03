@@ -1,3 +1,7 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+
+
 class Node:
     """
     Represents a node in a knowledge graph that stores information about an entity.
@@ -50,6 +54,31 @@ class Node:
         for edge in self.incoming_edges:
             related.append((edge.source, edge, False))
         return related
+    def get_outgoing_nodes(self):
+        """
+        Get all nodes directly connected to this node.
+        
+        Returns:
+            List of tuples containing (related_node, edge, is_outgoing)
+        """
+        related = []
+        for edge in self.outgoing_edges:
+            related.append((edge.target, edge, True))
+
+        return related
+    
+    def get_incoming_nodes(self):
+        """
+        Get all nodes directly connected to this node.
+        
+        Returns:
+            List of tuples containing (related_node, edge, is_outgoing)
+        """
+        related = []
+        for edge in self.incoming_edges:
+            related.append((edge.source, edge, False))
+
+        return related
     
     def build_prompt(self, include_related=True, max_related=5, prompt_template=None):
         """
@@ -67,18 +96,18 @@ class Node:
         if prompt_template is None:
             prompt = f"Entity: {self.name}\n\nDescription: {self.description}\n\n"
             
-            if include_related and self.get_related_nodes():
+            if include_related and self.get_outgoing_nodes():
                 prompt += "Related Entities:\n"
-                related_nodes = self.get_related_nodes()
+                related_nodes = self.get_outgoing_nodes()
                 # Limit the number of related nodes to avoid overly long prompts
                 for (node, edge, is_outgoing) in related_nodes[:max_related]:
                     relation_text = edge.relation_text
                     if is_outgoing:
                         prompt += f"- {self.name} {relation_text} {node.name}\n"
-                        prompt += f"  {node.name}: {node.description[:100]}...\n"
+                        prompt += f"  {node.name}: {node.description}\n"
                     else:
                         prompt += f"- {node.name} {relation_text} {self.name}\n"
-                        prompt += f"  {node.name}: {node.description[:100]}...\n"
+                        prompt += f"  {node.name}: {node.description}\n"
                 
                 prompt += "\nGenerate content for the entity above, considering its description and relationships."
             else:
@@ -203,33 +232,29 @@ class KnowledgeGraph:
             List of all Edge objects
         """
         return self.edges
+    
+    def visualize(self):
+        """
+        Visualize the knowledge graph using networkx and matplotlib.
+        """
+        G = nx.DiGraph()  # Create a directed graph
+
+        # Add nodes and edges to the graph
+        for node_id, node in self.nodes.items():
+            G.add_node(node_id, label=node.name, )
+
+        for edge in self.edges:
+            G.add_edge(edge.source.id, edge.target.id, label=edge.relation_text)
+
+        # Draw the graph
+        pos = nx.spring_layout(G)  # Layout for positioning nodes
+        nx.draw(G, pos, with_labels=True, node_size=3000, node_color="lightblue", font_size=10, font_weight="bold")
+        edge_labels = nx.get_edge_attributes(G, 'label')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color="red")
+
+        # Show the graph
+        plt.title("Knowledge Graph Visualization")
+        plt.show()
+    
 
 
-# Example usage
-def example_usage():
-    # Create a knowledge graph
-    kg = KnowledgeGraph()
-    
-    # Add some nodes
-    character = Node("char1", "Protagonist", "A complex character with a troubled past who seeks redemption")
-    setting = Node("setting1", "Medieval Castle", "A dark, foreboding castle with ancient secrets")
-    plot = Node("plot1", "Revenge Plot", "A story about seeking vengeance against those who wronged the protagonist")
-    
-    # Add nodes to the graph
-    kg.add_node(character)
-    kg.add_node(setting)
-    kg.add_node(plot)
-    
-    # Create relationships between nodes
-    kg.add_edge("char1", "setting1", "lives in")
-    kg.add_edge("char1", "plot1", "drives")
-    kg.add_edge("setting1", "plot1", "influences")
-    
-    # Generate a prompt for the character node
-    prompt = character.build_prompt()
-    print("Generated Prompt:")
-    print(prompt)
-
-
-if __name__ == "__main__":
-    example_usage()
