@@ -153,6 +153,7 @@ def show_context_menu(tap_node, mouseover_node, style):
      State('cytoscape-graph', 'elements')]
 )
 def handle_context_menu_click(n_clicks, node_data, elements):
+    print(f"Node Data: {node_data}")
     if not callback_context.triggered or not node_data:
         return elements
     
@@ -170,6 +171,7 @@ def handle_context_menu_click(n_clicks, node_data, elements):
         # Handle delete node action
         elements = [ele for ele in elements 
                    if ele['data']['id'] != node_data['id']]
+    print(f"Action: {action}, Node ID: {node_data['id']}")
     
     return elements
 

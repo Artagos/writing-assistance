@@ -1,0 +1,14 @@
+Necesito que me extraigas entidades y relaciones del texto que te voy a proveer en el siguiente formato:
+
+Node('id de la entidad', 'nombre del nodo/entidad', 'contenido a generar en esta entidad')
+
+También es preciso extraer relaciones en el siguiente formato:
+Relation('id de la entidad', 'id de la entidad', 'descripción resumida y breve de la relacion que mantienen' )
+
+es necesario que las entidades qe se extraigan sean componente de redaccion(ej: parrafo, introduccion, enunciado y cualquiera que identifiques).
+
+Texto a analizar:
+Introducción explicando que queremos construir una herramienta para asistencia a la escritura y que la novedad que queremos introducir es una representación en grafo de lo que se quiere lograr o de lo que se va construyendo.
+Un primer párrafo enunciando los desafíos a los que nos enfrentamos (extracción de entidades y relaciones, construcción de grafo de conocimiento a partir de texto plano y la interacción con el grafo de conocimiento).
+Un segundo párrafo explicando la interacción con el grafo de conocimiento mencionada en el primer párrafo. En este se explica que la generacion de texto en los nodos del grafo se hace construyendo un prompt a partir del contenido del propio nodo, de sus relaciones y el contenido generado en los nodos con los que esta relacionado.
+Un 3er parrafo que, refiriendose a la forma de generar texto descrita en el segundo parrafo se crea un problema de dependencia circular (pues si 2 nodos dependen el uno del otro no se podra generar contenido porque el contenido de uno dependera de el del otro)

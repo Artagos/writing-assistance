@@ -1,3 +1,4 @@
+from narwhals import String
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -22,6 +23,7 @@ class Node:
         self.attributes = attributes or {}
         self.incoming_edges = []
         self.outgoing_edges = []
+        self.generated_content:String=None
     
     def add_outgoing_edge(self, edge):
         """
@@ -94,24 +96,24 @@ class Node:
             A string containing the generated prompt
         """
         if prompt_template is None:
-            prompt = f"Entity: {self.name}\n\nDescription: {self.description}\n\n"
+            prompt = f"Entidad: {self.name}\n\nDescripción: {self.description}\n\n"
             
             if include_related and self.get_outgoing_nodes():
-                prompt += "Related Entities:\n"
+                prompt += "Entidades relacionadas:\n"
                 related_nodes = self.get_outgoing_nodes()
                 # Limit the number of related nodes to avoid overly long prompts
                 for (node, edge, is_outgoing) in related_nodes[:max_related]:
                     relation_text = edge.relation_text
                     if is_outgoing:
                         prompt += f"- {self.name} {relation_text} {node.name}\n"
-                        prompt += f"  {node.name}: {node.description}\n"
+                        prompt += f"  Contenido de {node.name}: {node.generated_content}\n"
                     else:
                         prompt += f"- {node.name} {relation_text} {self.name}\n"
                         prompt += f"  {node.name}: {node.description}\n"
                 
-                prompt += "\nGenerate content for the entity above, considering its description and relationships."
+                prompt += "\nGenera contenido para la entidad anterior, considerando su descripción y relaciones."
             else:
-                prompt += "Generate content for the entity above based on its description."
+                prompt += "Genera contenido para la entidad anterior basado en su descripción."
         else:
             # Use the custom template with some basic variable substitution
             prompt = prompt_template.replace("{name}", self.name)
